@@ -15,7 +15,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-// BUNLARI EKLİYORUZ (Geliştirici modundayken Swagger arayüzünü açıyoruz)
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
