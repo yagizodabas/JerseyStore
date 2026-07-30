@@ -7,7 +7,7 @@
         public string Address { get; set; }
         public string Phone { get; set; }
 
-        // Siparişin içindeki ürünlerin listesi
+
         public List<OrderItem> Items { get; set; }
     }
 
