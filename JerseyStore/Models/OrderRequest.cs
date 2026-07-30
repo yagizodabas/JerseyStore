@@ -1,16 +1,21 @@
-﻿namespace JerseyStore.Models
-{
+﻿using System.ComponentModel.DataAnnotations;
 
+namespace JerseyStore.Models
+{
     public class OrderRequest
     {
+        [Required(ErrorMessage = "Please enter the customer name.")]
         public string CustomerName { get; set; }
-        public string Address { get; set; }
-        public string Phone { get; set; }
 
+        [Required(ErrorMessage = "Delivery address is required.")]
+        public string Address { get; set; }
+
+        [Required(ErrorMessage = "Phone number is required.")]
+        [Phone(ErrorMessage = "Please enter a valid phone number.")]
+        public string Phone { get; set; }
 
         public List<OrderItem> Items { get; set; }
     }
-
 
     public class OrderItem
     {
