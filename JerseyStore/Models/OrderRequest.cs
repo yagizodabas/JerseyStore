@@ -21,5 +21,8 @@ namespace JerseyStore.Models
     {
         public int ProductId { get; set; }
         public int Quantity { get; set; }
+
+        public int? JerseyNumber { get; set; } 
+        public string? PrintName { get; set; }
     }
 }
