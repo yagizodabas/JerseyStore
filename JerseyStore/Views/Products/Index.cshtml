@@ -1,0 +1,74 @@
+﻿@{
+    ViewData["Title"] = "Ürünler";
+}
+
+<h2 class="mb-4">Forma Listesi</h2>
+
+<table class="table table-striped align-middle" id="productsTable">
+    <thead>
+        <tr>
+            <th>Takım</th>
+            <th>Fiyat</th>
+            <th>Stok</th>
+            <th>Adet</th>
+            <th>Forma No (opsiyonel)</th>
+            <th>Baskı İsim (opsiyonel)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody id="productsBody">
+        <tr><td colspan="7">Yükleniyor...</td></tr>
+    </tbody>
+</table>
+
+<a href="/Orders/Cart" class="btn btn-success">Sepete Git 🛒</a>
+
+@section Scripts {
+    <script>
+        async function loadProducts() {
+            const tbody = document.getElementById('productsBody');
+            try {
+                const res = await fetch('/api/store/products');
+                if (!res.ok) throw new Error('İstek başarısız');
+                const products = await res.json();
+
+                tbody.innerHTML = '';
+                products.forEach(p => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                                <td>${p.teamName}</td>
+                                <td>${p.price} TL</td>
+                                <td>${p.stock}</td>
+                                <td><input type="number" min="1" value="1" style="width:70px" id="qty-${p.id}" class="form-control"></td>
+                                <td><input type="number" style="width:90px" id="jn-${p.id}" class="form-control"></td>
+                                <td><input type="text" style="width:120px" id="pn-${p.id}" class="form-control"></td>
+                                <td><button class="btn btn-primary btn-sm" onclick="addToCart(${p.id}, '${p.teamName}', ${p.price})">Sepete Ekle</button></td>
+                            `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-danger">Ürünler yüklenemedi.</td></tr>';
+            }
+        }
+
+        function addToCart(id, teamName, price) {
+            const qty = parseInt(document.getElementById('qty-' + id).value) || 1;
+            const jerseyNumber = document.getElementById('jn-' + id).value;
+            const printName = document.getElementById('pn-' + id).value;
+
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            cart.push({
+                productId: id,
+                teamName: teamName,
+                price: price,
+                quantity: qty,
+                jerseyNumber: jerseyNumber ? parseInt(jerseyNumber) : null,
+                printName: printName || null
+            });
+            localStorage.setItem('cart', JSON.stringify(cart));
+            alert(teamName + ' sepete eklendi.');
+        }
+
+        loadProducts();
+    </script>
+}
