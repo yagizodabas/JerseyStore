@@ -1,10 +1,10 @@
 # Depo incelemesi — 5 Kasım 2026
 
-Bu raporda uygulanan kod değişiklikleri [PR #1](https://github.com/yagizodabas/JerseyStore/pull/1) dalındadır. Ana dalın koduna henüz birleştirilmemiştir.
+Bu rapor [PR #1](https://github.com/yagizodabas/JerseyStore/pull/1) kapsamındaki inceleme ve düzeltmeleri belgeler. Birleştirme ve otomatik kontrol durumu PR sayfasından izlenebilir.
 
 ## Dal ve dosya düzeni
 
-- `master`: varsayılan dal. Bu inceleme sırasındaki uygulama sürümü ilk API prototipidir; kök README burada da mevcuttur.
+- `master`: varsayılan dal; kullanıcıların klonladığında aldığı sürüm. Kök README ve uygulama belgeleri bu sürümle birlikte tutulur.
 - `pys_23`: ürün ve sepet ekranlarını içeren mevcut çalışma dalıydı. Bu dalın geçmişi PR #1 dalına birleştirildi; kaynak dal silinmedi.
 - `improve/project-quality`: PR #1 kapsamındaki bütünleşik sürüm. Ana daldaki README eklemesiyle oluşan çakışma giderildi.
 - `JerseyStore.slnx` ve `README.md` kökte, uygulama kaynakları `JerseyStore/` altında doğru konumdadır. `src/` klasörü eklemek tek uygulamalı bu depo için zorunlu değildir.
@@ -39,7 +39,7 @@ Testler yalnızca bu inceleme için oluşturulan `JerseyStore_Verification_01a1a
 
 ## Kalan işler ve sınırlar
 
-1. PR #1 henüz ana dala birleştirilmedi. Ana dalın belgeleriyle PR sürümünü birbirine karıştırmayın.
+1. Dal ve yayın durumu PR sayfasından izlenmelidir; GitHub ana dal güncellemesi canlı bir siteye dağıtım anlamına gelmez.
 2. Mevcut veritabanı şeması paylaşılmadığından canlı veritabanına uyumluluk doğrulanmadı. Özellikle OrderNumber en az 34 karakter olmalıdır. Yeni kurulum şeması mevcut tablolar üzerinde çalıştırılmaz.
 3. Ödeme, hesap/yetki, yönetim, kargo ve sipariş durumu özellikleri yoktur. Sunucu tarafı idempotency ve kötüye kullanım sınırlandırması üretim öncesi ele alınmalıdır.
 4. Bir proje lisansı seçilmemiştir. Hak sahibinin kararı olmadan MIT/Apache gibi bir lisans eklenmedi.

@@ -12,12 +12,11 @@ ASP.NET Core MVC ile geliştirilen forma mağazası prototipi. Dapper ve SQL Ser
 
 ## Yerel kurulum
 
-1. Depoyu klonlayın ve kök klasöre geçin. Bu değişiklikler PR #1 içinde olduğu sürece `improve/project-quality` dalını seçin:
+1. Depoyu klonlayın ve kök klasöre geçin:
 
    ```sh
    git clone https://github.com/yagizodabas/JerseyStore.git
    cd JerseyStore
-   git switch improve/project-quality
    ```
 
 2. SQL Server üzerinde boş bir `JerseyStoreDb` veritabanı oluşturun.
