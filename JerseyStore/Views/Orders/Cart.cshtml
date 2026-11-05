@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = "Sepetim";
+}
+<section class="collection" aria-labelledby="cart-title">
+    <p class="eyebrow">SİPARİŞ</p>
+    <h1 id="cart-title" class="page-title">Sepetim</h1>
+    <p id="cart-status" role="status" aria-live="polite"></p>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <caption>Sepetinizdeki ürünler ve tahmini tutarlar</caption>
+            <thead><tr><th scope="col">Takım</th><th scope="col">Adet</th><th scope="col">Forma no</th><th scope="col">Baskı adı</th><th scope="col">Tutar</th><th scope="col">İşlem</th></tr></thead>
+            <tbody id="cart-body"></tbody>
+        </table>
+    </div>
+    <p>Tahmini toplam: <strong id="cart-total"></strong></p>
+    <p class="text-muted">Kesin fiyat ve stok sipariş gönderildiğinde sunucuda kontrol edilir.</p>
+    <form id="checkout" class="checkout-form">
+        <h2>Teslimat bilgileri</h2>
+        <label for="customerName">Ad soyad</label>
+        <input id="customerName" class="form-control" name="customerName" autocomplete="name" required maxlength="120" />
+        <label for="address">Teslimat adresi</label>
+        <textarea id="address" class="form-control" name="address" autocomplete="street-address" required maxlength="500" rows="3"></textarea>
+        <label for="phone">Telefon</label>
+        <input id="phone" class="form-control" name="phone" type="tel" autocomplete="tel" required maxlength="30" />
+        <p>Bu prototip ödeme almaz. Sipariş ve teslimat bilgileri veritabanına kaydedilir. Gerçek kişisel bilgi yerine test bilgileri kullanın.</p>
+        <button id="submit-order" class="btn btn-dark" type="submit">Siparişi gönder</button>
+        <button id="clear-cart" class="btn btn-outline-danger" type="button">Sepeti temizle</button>
+        <a class="btn btn-link" asp-controller="Products" asp-action="Index">Koleksiyona dön</a>
+    </form>
+    <p id="order-result" class="mt-4" role="status" aria-live="polite"></p>
+</section>
+@section Scripts {
+    <script src="~/js/cart-store.js" asp-append-version="true"></script>
+    <script src="~/js/checkout.js" asp-append-version="true"></script>
+}

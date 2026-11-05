@@ -1,73 +1,62 @@
 # JerseyStore
 
-ASP.NET Core MVC, Dapper ve SQL Server ile geliştirilen forma mağazası prototipi. Ürün listeleme, kişiselleştirilmiş forma siparişi oluşturma ve stok takibi için bir HTTP API içerir.
+ASP.NET Core MVC ile geliştirilen forma mağazası prototipi. Dapper ve SQL Server üzerinden ürün listeler, kişiselleştirilmiş forma siparişlerini kaydeder ve stok takibi yapar. Ürün kataloğu ve tarayıcıda tutulan sepet arayüzü içerir.
 
-## Teknolojiler
-
-- C# / .NET 10
-- ASP.NET Core MVC
-- SQL Server ve Microsoft.Data.SqlClient
-- Dapper
-- Swagger / Swashbuckle
-
-## Mevcut özellikler
-
-- Ürünlerin fiyat ve stok bilgileriyle listelenmesi
-- Müşteri ve teslimat bilgileriyle sipariş oluşturulması
-- Forma numarası ve baskı adı seçimi
-- Sipariş toplamının sunucuda hesaplanması
-- Sipariş, sipariş satırları ve stok değişikliklerinin veritabanı işlemi içinde kaydedilmesi
-- Geliştirme ortamında Swagger API arayüzü
-
-Ana daldaki web sayfası henüz varsayılan MVC şablonudur. Proje ödeme, kullanıcı hesabı, yönetim paneli ve kargo entegrasyonu içermez; üretime hazır bir e-ticaret sistemi değildir.
+`pys_23` dalındaki ürün ve sepet çalışması bu sürüme dahil edilmiştir; sepet akışı korunup güvenli metin üretimi ve doğrulamayla düzenlenmiştir.
 
 ## Gereksinimler
 
 - .NET 10 SDK
 - SQL Server veya SQL Server Express
-- İsteğe bağlı Visual Studio ya da VS Code
+- İsteğe bağlı: Visual Studio / VS Code
 
-## Kurulum
+## Yerel kurulum
 
-```sh
-git clone https://github.com/yagizodabas/JerseyStore.git
-cd JerseyStore
-dotnet restore JerseyStore.slnx
-dotnet build JerseyStore.slnx
-```
+1. Depoyu klonlayın ve kök klasöre geçin:
 
-Varsayılan bağlantı yerel SQL Express üzerindeki `JerseyStoreDb` veritabanını kullanır. Başka bir sunucu için bağlantıyı ortam değişkeniyle ayarlayın:
+   ```sh
+   git clone https://github.com/yagizodabas/JerseyStore.git
+   cd JerseyStore
+   ```
 
-```powershell
-$env:ConnectionStrings__DefaultConnection = 'Server=localhost;Database=JerseyStoreDb;Integrated Security=True;Encrypt=True;TrustServerCertificate=True;'
-```
+2. SQL Server üzerinde boş bir `JerseyStoreDb` veritabanı oluşturun.
+3. Bu veritabanında `database/schema.sql` dosyasını çalıştırın. Bu dosya yalnızca yeni kurulum içindir; mevcut veritabanı için geçiş betiği değildir.
+4. Bağlantıyı ayarlayın. Varsayılan ayar yerel Windows SQL Express içindir. Başka sunucuda ortam değişkeni kullanın:
 
-`TrustServerCertificate=True` yalnızca yerel geliştirme içindir. Üretimde doğrulanmış sertifika kullanın. Parola veya gerçek müşteri verilerini depoya eklemeyin.
+   ```powershell
+   $env:ConnectionStrings__DefaultConnection = 'Server=localhost;Database=JerseyStoreDb;Integrated Security=True;Encrypt=True;TrustServerCertificate=True;'
+   ```
 
-**Veritabanı:** Bu ana dalda henüz şema veya migration dosyası bulunmuyor. Uygulama, aşağıdaki tabloların mevcut olmasını bekler; yalnızca uygulamayı başlatmak veritabanını oluşturmaz:
+   `TrustServerCertificate=True` yalnızca yerel geliştirme içindir. Üretimde doğrulanmış sunucu sertifikası kullanın. Parolalı bağlantıları Git'e eklemeyin.
 
-| Tablo | Kullanılan sütunlar |
+5. Uygulamayı başlatın:
+
+   ```sh
+   dotnet restore JerseyStore.slnx --locked-mode
+   dotnet build JerseyStore.slnx --configuration Release
+   dotnet run --project JerseyStore --launch-profile https
+   ```
+
+Terminalde yazan adresi açın. HTTP profili `http://localhost:5062`, HTTPS profili `https://localhost:7145` kullanır. HTTPS sertifikası hazır değilse yerel geliştirme için `dotnet dev-certs https --trust` veya `dotnet run --project JerseyStore --launch-profile http` kullanın. Geliştirme ortamında `/swagger` etkileşimli API belgesidir. Ürün tablosu başlangıçta boştur; test ürünlerinizi veritabanına ekleyin.
+
+## Sayfalar
+
+| Yol | İçerik |
 | --- | --- |
-| Products | Id, TeamName, Price, Stock |
-| Orders | Id, OrderNumber, CustomerName, Address, Phone, OrderDate, TotalAmount |
-| OrderItems | OrderId, ProductId, Quantity, UnitPrice, JerseyNumber, PrintName |
+| `/` veya `/Products/Index` | Ürün kataloğu ve sepete ekleme |
+| `/Orders/Cart` | Sepet, kişiselleştirme özeti ve teslimat formu |
+| `/Home/Privacy` | Prototipin veri kullanımı açıklaması |
 
-Veritabanı hazır olduğunda:
+Fiyatlar mevcut sepet arayüzünün kullandığı Türk lirasıyla gösterilir. Sepetteki fiyatlar tahminidir; kesin tutarı sunucu hesaplar. Müşteri adı, adres ve telefon tarayıcı sepetine kaydedilmez. Sepet tarayıcı `localStorage` alanını kullanır; bozuk veya erişilemeyen depolama için hata gösterilir.
 
-```sh
-dotnet run --project JerseyStore --launch-profile https
-```
-
-Terminalde gösterilen adrese gidin. Geliştirme ortamında `/swagger` üzerinden API'yi inceleyebilirsiniz.
-
-## API kullanımı
+## API
 
 | Yöntem | Yol | Açıklama |
 | --- | --- | --- |
-| GET | `/api/store/products` | Ürünleri listeler |
-| POST | `/api/store/order` | Sipariş oluşturur |
+| GET | `/api/store/products` | Kimliğe göre sıralanmış ürünler |
+| POST | `/api/store/order` | Sipariş oluşturur ve stoğu tek işlemde düşürür |
 
-Örnek sipariş gövdesi; ürün kimliğini kendi veritabanınıza göre değiştirin:
+Örnek sipariş (ürün kimliğini kendi verinize göre değiştirin):
 
 ```json
 {
@@ -75,29 +64,37 @@ Terminalde gösterilen adrese gidin. Geliştirme ortamında `/swagger` üzerinde
   "address": "Örnek teslimat adresi",
   "phone": "+905551112233",
   "items": [
-    {
-      "productId": 1,
-      "quantity": 1,
-      "jerseyNumber": 10,
-      "printName": "ÖRNEK"
-    }
+    { "productId": 1, "quantity": 1, "jerseyNumber": 10, "printName": "ÖRNEK" }
   ]
 }
 ```
 
-## Proje yapısı
+Adet 1–100, forma numarası 0–99 aralığındadır. Sepet en fazla 100 satır içerir. Fiyat ve toplam sunucuda hesaplanır. Sipariş zamanı UTC'dir. Geçersiz istek `400`, bulunamayan veya yetersiz stoklu ürün `409`, veritabanı hatası `503` döndürür. İşlem başarısızsa sipariş ve stok değişiklikleri geri alınır. Aynı ürünü içeren satırlar da sırayla stoktan düşülür.
 
-```text
-JerseyStore.slnx
-JerseyStore/
-  Controllers/       MVC ve API uçları
-  Models/            Ürün ve sipariş modelleri
-  Views/             Razor sayfaları
-  wwwroot/           CSS, JavaScript ve statik dosyalar
-  Program.cs         Uygulama yapılandırması
-  appsettings.json   Varsayılan yerel bağlantı ve log ayarları
+## Yapı
+
+- `JerseyStore/Controllers`: MVC ve HTTP API uçları
+- `JerseyStore/Models`: Ürün ve doğrulanan sipariş istekleri
+- `JerseyStore/Views`, `wwwroot`: Sunucu tarafından sunulan arayüz ve varlıklar
+- [database/schema.sql](database/schema.sql): Yeni veritabanı şeması
+- [docs/verification.md](docs/verification.md): SQL Server ile işlevsel kontrol adımları ve sonuçlar
+- [docs/repository-review.md](docs/repository-review.md): Depo incelemesi ve kalan işler
+- [CONTRIBUTING.md](CONTRIBUTING.md): Geliştirme ve katkı akışı
+- `global.json`, `JerseyStore/packages.lock.json`: SDK seçimi ve kilitli bağımlılıklar
+- `.github/workflows/build.yml`: Push ve PR için Release derlemesi
+
+## Mevcut kapsam
+
+Bu proje bir prototiptir. Ödeme, kullanıcı hesabı, yönetim paneli, kargo entegrasyonu ve sipariş durum sorgulama içermez. Üretim kullanımı öncesinde kimlik doğrulama/yetkilendirme, kötüye kullanım sınırlandırması, kişisel veri saklama politikası ve yinelenen siparişleri önleyen idempotency desteği tasarlanmalıdır. Yanıt alınamayan bir siparişi otomatik tekrar göndermek çift sipariş oluşturabilir.
+
+Mevcut veritabanınız varsa yeni model sınırlarıyla sütun uzunluklarını karşılaştırın. Sipariş numarası artık `JS` + 32 karakterlik kimliktir; `OrderNumber` sütunu en az 34 karakter olmalıdır. Mevcut veriyi yedekleyip ayrı bir geçiş planı hazırlayın; şema dosyasını mevcut tablolar üzerinde çalıştırmayın.
+
+## Otomatik doğrulama
+
+Uygulama çalışırken PowerShell 7 ile:
+
+```powershell
+./scripts/smoke.ps1 -BaseUrl http://localhost:5062
 ```
 
-## Hazırlanan iyileştirmeler
-
-[PR #1](https://github.com/yagizodabas/JerseyStore/pull/1), sipariş doğrulaması, eşzamanlı stok güvenliği, mobil uyumlu ürün kataloğu, yeni veritabanı şeması, bağımlılık güvenlik düzeltmesi ve otomatik kontroller içerir. Bu değişiklikler henüz ana dala birleştirilmemiştir. Gerçek SQL Server üzerinde sipariş ve eşzamanlılık testleri ile tarayıcıda görsel doğrulama tamamlanmalıdır.
+Portu uygulamanın adresine göre değiştirin. Test, 11 geçersiz sipariş isteğinin veritabanına ulaşmadan reddedildiğini ve katalog HTML sayfasının sunulduğunu kontrol eder. GitHub Actions bu kontrolü derlemeden sonra çalıştırır. Gerçek sipariş ve eşzamanlılık testleri için `docs/verification.md` dosyasına bakın.
