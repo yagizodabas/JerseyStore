@@ -1,0 +1,31 @@
+name: Build
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet restore JerseyStore.slnx
+      - run: dotnet build JerseyStore.slnx --no-restore --configuration Release --warnaserror
+      - name: Start test server
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+          ConnectionStrings__DefaultConnection: 'Server=127.0.0.1,1;Database=Test;User Id=test;Password=unused;Connect Timeout=1;Encrypt=True;TrustServerCertificate=True;'
+        run: |
+          dotnet run --project JerseyStore --configuration Release --no-build --no-launch-profile --urls http://127.0.0.1:5080 > /tmp/jerseystore.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:5080 > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/jerseystore.log
+          exit 1
+      - name: Validate requests and catalog page
+        shell: pwsh
+        run: ./scripts/smoke.ps1 -BaseUrl http://127.0.0.1:5080
