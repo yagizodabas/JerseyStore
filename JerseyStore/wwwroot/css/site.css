@@ -229,3 +229,38 @@ h1 span {
 }
 
 }
+
+.store-header nav {
+    display: flex;
+    gap: 24px;
+}
+.page-title {
+    font-size: clamp(32px, 5vw, 56px);
+    line-height: 1.1;
+}
+.product-options {
+    display: grid;
+    gap: 12px;
+    margin-top: 20px;
+}
+.product-options label {
+    display: grid;
+    gap: 5px;
+    font-size: 12px;
+}
+.checkout-form {
+    max-width: 620px;
+    margin-top: 40px;
+}
+.checkout-form label {
+    display: block;
+    margin-top: 18px;
+    margin-bottom: 6px;
+}
+.checkout-form p {
+    margin-top: 20px;
+    color: #57675d;
+}
+.table {
+    min-width: 620px;
+}

@@ -1,132 +1,35 @@
-﻿@{
+@{
     ViewData["Title"] = "Sepetim";
 }
-
-<h2 class="mb-4">Sepetim</h2>
-
-<table class="table" id="cartTable">
-    <thead>
-        <tr>
-            <th>Takım</th>
-            <th>Adet</th>
-            <th>Forma No</th>
-            <th>Baskı İsim</th>
-            <th>Ara Toplam</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody id="cartBody"></tbody>
-</table>
-
-<h4>Toplam: <span id="grandTotal">0</span> TL</h4>
-
-<hr />
-
-<h4>Teslimat Bilgileri</h4>
-<div class="mb-3">
-    <label>Ad Soyad</label>
-    <input type="text" id="customerName" class="form-control" />
-</div>
-<div class="mb-3">
-    <label>Adres</label>
-    <input type="text" id="address" class="form-control" />
-</div>
-<div class="mb-3">
-    <label>Telefon</label>
-    <input type="text" id="phone" class="form-control" />
-</div>
-
-<button class="btn btn-primary" onclick="submitOrder()">Siparişi Onayla</button>
-<button class="btn btn-outline-danger" onclick="clearCart()">Sepeti Temizle</button>
-
-<div id="result" class="mt-3"></div>
-
+<section class="collection" aria-labelledby="cart-title">
+    <p class="eyebrow">SİPARİŞ</p>
+    <h1 id="cart-title" class="page-title">Sepetim</h1>
+    <p id="cart-status" role="status" aria-live="polite"></p>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <caption>Sepetinizdeki ürünler ve tahmini tutarlar</caption>
+            <thead><tr><th scope="col">Takım</th><th scope="col">Adet</th><th scope="col">Forma no</th><th scope="col">Baskı adı</th><th scope="col">Tutar</th><th scope="col">İşlem</th></tr></thead>
+            <tbody id="cart-body"></tbody>
+        </table>
+    </div>
+    <p>Tahmini toplam: <strong id="cart-total"></strong></p>
+    <p class="text-muted">Kesin fiyat ve stok sipariş gönderildiğinde sunucuda kontrol edilir.</p>
+    <form id="checkout" class="checkout-form">
+        <h2>Teslimat bilgileri</h2>
+        <label for="customerName">Ad soyad</label>
+        <input id="customerName" class="form-control" name="customerName" autocomplete="name" required maxlength="120" />
+        <label for="address">Teslimat adresi</label>
+        <textarea id="address" class="form-control" name="address" autocomplete="street-address" required maxlength="500" rows="3"></textarea>
+        <label for="phone">Telefon</label>
+        <input id="phone" class="form-control" name="phone" type="tel" autocomplete="tel" required maxlength="30" />
+        <p>Bu prototip ödeme almaz. Sipariş ve teslimat bilgileri veritabanına kaydedilir. Gerçek kişisel bilgi yerine test bilgileri kullanın.</p>
+        <button id="submit-order" class="btn btn-dark" type="submit">Siparişi gönder</button>
+        <button id="clear-cart" class="btn btn-outline-danger" type="button">Sepeti temizle</button>
+        <a class="btn btn-link" asp-controller="Products" asp-action="Index">Koleksiyona dön</a>
+    </form>
+    <p id="order-result" class="mt-4" role="status" aria-live="polite"></p>
+</section>
 @section Scripts {
-    <script>
-        function getCart() {
-            return JSON.parse(localStorage.getItem('cart') || '[]');
-        }
-
-        function renderCart() {
-            const cart = getCart();
-            const tbody = document.getElementById('cartBody');
-            tbody.innerHTML = '';
-            let total = 0;
-
-            cart.forEach((item, index) => {
-                const subTotal = item.price * item.quantity;
-                total += subTotal;
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                            <td>${item.teamName}</td>
-                            <td>${item.quantity}</td>
-                            <td>${item.jerseyNumber ?? '-'}</td>
-                            <td>${item.printName ?? '-'}</td>
-                            <td>${subTotal} TL</td>
-                            <td><button class="btn btn-sm btn-outline-danger" onclick="removeItem(${index})">Çıkar</button></td>
-                        `;
-                tbody.appendChild(row);
-            });
-
-            document.getElementById('grandTotal').innerText = total;
-        }
-
-        function removeItem(index) {
-            let cart = getCart();
-            cart.splice(index, 1);
-            localStorage.setItem('cart', JSON.stringify(cart));
-            renderCart();
-        }
-
-        function clearCart() {
-            localStorage.removeItem('cart');
-            renderCart();
-        }
-
-        async function submitOrder() {
-            const cart = getCart();
-            const resultDiv = document.getElementById('result');
-
-            if (cart.length === 0) {
-                resultDiv.innerHTML = '<div class="alert alert-warning">Sepetiniz boş.</div>';
-                return;
-            }
-
-            const body = {
-                customerName: document.getElementById('customerName').value,
-                address: document.getElementById('address').value,
-                phone: document.getElementById('phone').value,
-                items: cart.map(item => ({
-                    productId: item.productId,
-                    quantity: item.quantity,
-                    jerseyNumber: item.jerseyNumber,
-                    printName: item.printName
-                }))
-            };
-
-            try {
-                const res = await fetch('/api/store/order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-                const data = await res.json();
-
-                if (res.ok) {
-                    resultDiv.innerHTML = `<div class="alert alert-success">
-                                Siparişiniz alındı! <b>Sipariş Numaranız: ${data.orderNumber}</b><br>
-                                Toplam Tutar: ${data.totalAmount} TL
-                            </div>`;
-                    localStorage.removeItem('cart');
-                    renderCart();
-                } else {
-                    resultDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
-                }
-            } catch (err) {
-                resultDiv.innerHTML = `<div class="alert alert-danger">Sunucuya ulaşılamadı.</div>`;
-            }
-        }
-
-        renderCart();
-    </script>
+    <script src="~/js/cart-store.js" asp-append-version="true"></script>
+    <script src="~/js/checkout.js" asp-append-version="true"></script>
 }

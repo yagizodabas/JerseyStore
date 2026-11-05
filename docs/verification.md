@@ -17,5 +17,5 @@ Bu kontroller gerçek SQL Server gerektirir; yalnızca derleme başarısı işle
 - .NET 10 Release derlemesi: 0 uyarı, 0 hata.
 - PowerShell HTTP testi: 11 geçersiz sipariş ve katalog sayfası başarılı.
 - Erişilemeyen veritabanıyla ürün listesi: beklenen 503 yanıtı başarılı.
-- SQL Server üzerinde gerçek sipariş/rollback/eşzamanlılık testleri çalıştırılmadı.
-- Tarayıcıda görsel doğrulama yapılmadı; katalog kontrolü HTML yanıtıyla sınırlıdır.
+- Ayrı SQL Express test veritabanında başarılı sipariş, rollback ve eşzamanlı stok testleri geçti; stok/satır sayıları SQL sorgularıyla doğrulandı.
+- Tarayıcıda katalog, sepet ve sentetik bilgilerle sipariş gönderimi doğrulandı. 390 piksel genişlikte düzen ve metin güvenliği kontrol edildi. Ayrıntılar: `docs/repository-review.md`.

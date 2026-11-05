@@ -11,11 +11,14 @@
 <body>
     <a class="skip-link" href="#main">İçeriğe geç</a>
     <header class="store-header">
-        <a class="store-brand" asp-controller="Home" asp-action="Index">JERSEY<span>STORE.</span></a>
-        <nav aria-label="Ana menü"><a href="/#collection">Koleksiyon <span aria-hidden="true">↗</span></a></nav>
+        <a class="store-brand" asp-controller="Products" asp-action="Index">JERSEY<span>STORE.</span></a>
+        <nav aria-label="Ana menü">
+            <a href="/#collection">Koleksiyon</a>
+            <a asp-controller="Orders" asp-action="Cart">Sepet</a>
+        </nav>
     </header>
     <main id="main">@RenderBody()</main>
-    <footer class="store-footer"><span>JERSEYSTORE</span><span>Forma koleksiyonu · @DateTime.UtcNow.Year</span></footer>
+    <footer class="store-footer"><span>JERSEYSTORE</span><a asp-controller="Home" asp-action="Privacy">Veri kullanımı</a><span>Forma koleksiyonu · @DateTime.UtcNow.Year</span></footer>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
